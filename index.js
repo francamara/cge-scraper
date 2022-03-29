@@ -1,5 +1,6 @@
 const axios = require('axios')
 const puppeteer = require('puppeteer')
+const colors = require('colors')
 
 require('dotenv').config()
 
@@ -21,9 +22,13 @@ async function scrape() {
 
   const cge = await page.goto(pageUrl)
   const isAvailable = await page.$eval(selector, element => element.textContent)
-  if (isAvailable == 'fecha por confirmar') {
+  if (isAvailable !== 'fecha por confirmar') {
     const url = `https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${telegramChatId}&text=${message}`
-    axios.post(url, {}).then(console.log('HAY TURNOS'))
+    axios.post(url, {}).then(console.log('HAY TURNOS'.green))
+  }
+
+  if (isAvailable == 'fecha por confirmar') {
+    console.log('SIN TURNOS TODAVIA'.red)
   }
 }
 

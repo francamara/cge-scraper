@@ -17,13 +17,13 @@ const selector = '#contenido > div > div > div > table > tbody > tr:nth-child(11
 
 // Main function
 async function scrape() {
-  const browser = await puppeteer.launch({ headless: true })
-  const page = await browser.newPage()
+  let browser = await puppeteer.launch({ headless: true })
+  let page = await browser.newPage()
 
-  const cge = await page.goto(pageUrl)
-  const isAvailable = await page.$eval(selector, element => element.textContent)
+  let cge = await page.goto(pageUrl)
+  let isAvailable = await page.$eval(selector, element => element.textContent)
   if (isAvailable !== 'fecha por confirmar') {
-    const url = `https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${telegramChatId}&text=${message}`
+    let url = `https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${telegramChatId}&text=${message}`
     axios.post(url, {}).then(console.log('HAY TURNOS'.green))
   }
 

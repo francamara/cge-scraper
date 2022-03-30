@@ -17,23 +17,70 @@ const selector = '#contenido > div > div > div > table > tbody > tr:nth-child(11
 
 // Main function
 async function scrape() {
-  let browser = await puppeteer.launch({ headless: true })
+  // launch browser and page
+  let browser = await puppeteer.launch({
+    headless: true,
+    defaultViewport: {
+      width: 1000,
+      height: 400
+    }
+  })
   let page = await browser.newPage()
-
   let cge = await page.goto(pageUrl)
+
+  // evaluate page
   let isAvailable = await page.$eval(selector, element => element.textContent)
+
+  // error handling
+  page.on("pageerror", async function (err) {
+    theTempValue = err.toString();
+    console.log("Page error: " + theTempValue);
+    // clear from memory
+    await page.removeAllListeners()
+    await browser.close();
+    return
+  })
+
+  // if true, then notify user
   if (isAvailable !== 'fecha por confirmar') {
     let url = `https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${telegramChatId}&text=${message}`
     axios.post(url, {}).then(console.log('HAY TURNOS'.green))
+    // clear memory
+    await page.removeAllListeners()
+    await browser.close();
+    return true
   }
+
 
   if (isAvailable == 'fecha por confirmar') {
     console.log('SIN TURNOS TODAVIA'.red)
+
+    // clear memory
+    await page.removeAllListeners()
+    await browser.close();
+
+    // temporal memory log so I can check how much is being used
+    const formatMemoryUsage = (data) => `${Math.round(data / 1024 / 1024 * 100) / 100} MB`
+
+    const memoryData = process.memoryUsage()
+
+    const memoryUsage = {
+      rss: `${formatMemoryUsage(memoryData.rss)} -> Resident Set Size - total memory allocated for the process execution`,
+      heapTotal: `${formatMemoryUsage(memoryData.heapTotal)} -> total size of the allocated heap`,
+      heapUsed: `${formatMemoryUsage(memoryData.heapUsed)} -> actual memory used during the execution`,
+      external: `${formatMemoryUsage(memoryData.external)} -> V8 external memory`,
+    }
+
+    console.log(memoryUsage)
+
+
+    return false
   }
+
 }
 
 scrape()
 
 setInterval(() => {
   scrape()
-}, 60000)
+}, 1000 * 30)

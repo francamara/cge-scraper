@@ -1,6 +1,7 @@
 const axios = require('axios')
 const puppeteer = require('puppeteer')
 const colors = require('colors')
+const { Temporal, Intl, toTemporalInstant } = require('@js-temporal/polyfill');
 
 const config = require('./config')
 
@@ -51,7 +52,8 @@ async function scrape() {
 
 
   if (isAvailable == 'fecha por confirmar') {
-    console.log('SIN TURNOS TODAVIA'.red)
+    const date = Temporal.Now.instant()
+    console.log('NOT AVAILABLE YET'.red, date.toString().gray)
 
     // clear memory
     await page.removeAllListeners()

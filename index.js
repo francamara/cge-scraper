@@ -2,14 +2,12 @@ const axios = require('axios')
 const puppeteer = require('puppeteer')
 const colors = require('colors')
 
+const config = require('./config')
+
 require('dotenv').config()
 
-// Telegram config
-const telegramToken = process.env.telegram_token
-const telegramChatId = process.env.telegram_chat_id
-const cgeUser = process.env.cge_user
-const cgePassword = process.env.cge_password
-const message = `SHIT%20IS%20AVAILABLE%2C%20RUN%20MOTHERFUCKER%0AUSER%3A%20${cgeUser}%0APASS%3A%20${cgePassword}`
+// Telegram message
+const message = `SHIT%20IS%20AVAILABLE%2C%20RUN%20MOTHERFUCKER%0AUSER%3A%20${config.cge.user}%0APASS%3A%20${config.cge.pwd}`
 
 // Puppeteer config
 const pageUrl = process.env.page_url
@@ -43,8 +41,8 @@ async function scrape() {
 
   // if true, then notify user
   if (isAvailable !== 'fecha por confirmar') {
-    let url = `https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${telegramChatId}&text=${message}`
-    axios.post(url, {}).then(console.log('HAY TURNOS'.green))
+    const url = `https://api.telegram.org/bot${config.telegram.token}/sendMessage?chat_id=${config.telegram.chatId}&text=${message}`
+    await axios.post(url, {}).then(console.log('HAY TURNOS'.green))
     // clear memory
     await page.removeAllListeners()
     await browser.close();

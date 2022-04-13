@@ -2,6 +2,8 @@ const axios = require('axios')
 const puppeteer = require('puppeteer')
 const colors = require('colors')
 const { Temporal, Intl, toTemporalInstant } = require('@js-temporal/polyfill');
+const cron = require('node-cron');
+
 
 const config = require('./config')
 
@@ -79,8 +81,8 @@ async function scrape() {
 
 }
 
-scrape()
+// Cron Schedule every 30 seconds
 
-setInterval(() => {
+cron.schedule('*/30 * * * * *', () => {
   scrape()
-}, 1000 * 30)
+});
